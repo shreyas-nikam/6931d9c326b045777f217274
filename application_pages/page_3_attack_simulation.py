@@ -4,6 +4,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+def _make_hashable(obj):
+    """Convert unhashable types (like lists) to hashable types (like tuples) for hashing."""
+    if isinstance(obj, dict):
+        return frozenset((k, _make_hashable(v)) for k, v in obj.items())
+    elif isinstance(obj, list):
+        return tuple(_make_hashable(item) for item in obj)
+    elif isinstance(obj, set):
+        return frozenset(_make_hashable(item) for item in obj)
+    else:
+        return obj
+
 def main():
     st.markdown("## 3. Adversarial Attack Simulation")
     st.markdown("""
@@ -19,7 +30,7 @@ def main():
         return
     
     # Initialize agent for attacks if not present or domain changed
-    current_domain_hash = hash(frozenset(st.session_state.operational_domain.items()))
+    current_domain_hash = hash(_make_hashable(st.session_state.operational_domain))
     if "attack_agent" not in st.session_state or st.session_state.get("attack_domain_hash") != current_domain_hash:
         st.session_state.attack_agent = MockLLMAgent(operational_domain=st.session_state.operational_domain)
         st.session_state.attack_domain_hash = current_domain_hash

@@ -2,6 +2,17 @@ import streamlit as st
 from utils import MockLLMAgent
 import pandas as pd
 
+def _make_hashable(obj):
+    """Convert unhashable types (like lists) to hashable types (like tuples) for hashing."""
+    if isinstance(obj, dict):
+        return frozenset((k, _make_hashable(v)) for k, v in obj.items())
+    elif isinstance(obj, list):
+        return tuple(_make_hashable(item) for item in obj)
+    elif isinstance(obj, set):
+        return frozenset(_make_hashable(item) for item in obj)
+    else:
+        return obj
+
 def main():
     st.markdown("## 4. Bias Induction and Data Poisoning")
     st.markdown("""
@@ -17,7 +28,7 @@ def main():
         return
 
     # Initialize agent for bias testing if not present. Re-initialize if domain changes to reset bias.
-    current_domain_hash = hash(frozenset(st.session_state.operational_domain.items()))
+    current_domain_hash = hash(_make_hashable(st.session_state.operational_domain))
     if "bias_agent" not in st.session_state or st.session_state.get("bias_domain_hash") != current_domain_hash:
         st.session_state.operational_domain["bias_induced"] = False # Reset bias when domain changes
         st.session_state.bias_agent = MockLLMAgent(operational_domain=st.session_state.operational_domain)
