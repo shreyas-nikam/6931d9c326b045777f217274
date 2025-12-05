@@ -1,1 +1,52 @@
-# Starter Python file
+import streamlit as st
+st.set_page_config(page_title="QuLab", layout="wide")
+st.sidebar.image("https://www.quantuniversity.com/assets/img/logo5.jpg")
+st.sidebar.divider()
+st.title("QuLab")
+st.divider()
+
+st.markdown("""
+As a **Risk Manager** at a leading financial firm, your critical responsibility is to ensure the integrity and security of all deployed AI systems. Today, you are tasked with evaluating a new **Large Language Model (LLM) based agent** designed to assist financial analysts with rapid market insights and data query responses.
+
+The successful deployment of this LLM agent hinges on understanding its vulnerabilities and implementing robust mitigation strategies. This application guides you, step-by-step, through a realistic scenario where you will:
+
+1.  **Define the Operational Domain:** Set the boundaries and rules for how the LLM agent interacts with sensitive financial data.
+2.  **Validate Baseline Behavior:** Observe the agent's performance under normal, non-malicious conditions.
+3.  **Simulate Adversarial Attacks:** Proactively test the agent for prompt injection vulnerabilities, a common attack vector.
+4.  **Identify Data-Related Risks:** Understand how potential data biases or poisoning could distort the agent's outputs.
+5.  **Implement Mitigation Strategies:** Apply defensive measures to enhance the agent's resilience against attacks.
+6.  **Evaluate Robustness and Report:** Consolidate your findings into a comprehensive risk assessment report.
+
+Your objective is to ensure this LLM agent is not only powerful but also secure and reliable, safeguarding against potential financial or reputational damage. Let's begin the evaluation!
+""")
+
+page = st.sidebar.selectbox(
+    label="Navigation",
+    options=[
+        "1. Introduction and Setup",
+        "2. Baseline Interaction",
+        "3. Adversarial Attack Simulation",
+        "4. Bias Induction and Data Poisoning",
+        "5. Mitigation Strategy Implementation",
+        "6. Robustness Evaluation and Reporting"
+    ]
+)
+
+if page == "1. Introduction and Setup":
+    from application_pages.page_1_intro_setup import main
+    main()
+elif page == "2. Baseline Interaction":
+    from application_pages.page_2_baseline_validation import main
+    main()
+elif page == "3. Adversarial Attack Simulation":
+    from application_pages.page_3_attack_simulation import main
+    main()
+elif page == "4. Bias Induction and Data Poisoning":
+    from application_pages.page_4_bias_poisoning import main
+    main()
+elif page == "5. Mitigation Strategy Implementation":
+    from application_pages.page_5_mitigation_strategy import main
+    main()
+elif page == "6. Robustness Evaluation and Reporting":
+    from application_pages.page_6_robustness_report import main
+    main()
