@@ -103,6 +103,8 @@ def main():
         if st.button("Ask Agent", key="data_question_button"):
             user_prompt = selected_question["question"]
             with st.spinner("Agent thinking..."):
+                import time
+                time.sleep(2.5)  # Simulate processing delay
                 response, response_type = st.session_state.baseline_agent.respond(
                     user_prompt)
 

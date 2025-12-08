@@ -70,6 +70,8 @@ class MockLLMAgent:
     def respond(self, prompt):
         response_type = "normal"
         response_text = ""
+        import time
+        time.sleep(2.5)  # Simulate processing delay
 
         # First, check for prompt injection attempts
         if any(keyword in prompt.lower() for keyword in ["ignore previous instructions", "act as", "disregard security"]):
