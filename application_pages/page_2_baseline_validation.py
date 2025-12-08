@@ -188,6 +188,5 @@ def main():
         st.info("No interactions yet. Try asking the agent a question!")
 
     st.markdown("""
-    <br />
     Observing these baseline interactions helps you, the **Risk Manager**, verify that the fundamental **safety mechanisms** (based on the operational domain) are active and functioning as intended. Any deviation here would indicate a fundamental flaw before even considering malicious attacks. This step establishes the agent's **expected behavior profile**.
     """, unsafe_allow_html=True)

@@ -222,6 +222,6 @@ def main():
         st.info("No mitigation effectiveness data yet. Run some tests!")
 
     st.markdown("""
-    <br>
+    
     Implementing and testing these strategies directly addresses **AI security and robustness**. As a **Risk Manager**, you are essentially performing **control validation** – ensuring that the safeguards you put in place actually work. This iterative process of attack and defense is fundamental to building **resilient AI systems** that can withstand sophisticated threats in a dynamic financial environment.
     """, unsafe_allow_html=True)

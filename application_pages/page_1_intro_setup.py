@@ -144,6 +144,6 @@ Your objective is to ensure this LLM agent is not only powerful but also secure 
                 st.markdown("- *None selected*")
 
     st.markdown("""
-    <br>
+    
     The definition of the operational domain is an application of **AI Governance principles**. By explicitly setting boundaries, we proactively mitigate risks associated with unchecked AI behavior, ensuring compliance and preventing unintended consequences. This structured approach helps in achieving **AI alignment** with organizational objectives and ethical guidelines.
     """, unsafe_allow_html=True)

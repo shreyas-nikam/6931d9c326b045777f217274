@@ -88,6 +88,6 @@ def main():
         )
 
     st.markdown("""
-    <br>
+    
     This report generation functionality embodies the principle of **accountability and transparency** in AI deployment. It translates complex technical findings into actionable business insights, enabling informed decision-making regarding the LLM agent's **readiness for production**. For the **Risk Manager**, this report is the tangible outcome of a thorough **AI risk management framework**, ensuring that potential vulnerabilities are understood and addressed before deployment.
     """, unsafe_allow_html=True)
