@@ -120,7 +120,7 @@ def main():
         st.info("No bias-related interactions yet.")
 
     st.markdown("""
-    <br>
+    
     This demonstration highlights the critical impact of **data integrity** on AI system reliability. As a **Risk Manager**, recognizing the potential for data poisoning means implementing robust **data governance** and **validation pipelines**. The presence of biased outputs signifies a failure in the **trustworthiness** of the AI system, demanding immediate attention to the data sources and model training processes.
     """, unsafe_allow_html=True)
     

@@ -86,6 +86,6 @@ def main():
         st.json(st.session_state.operational_domain)
     
     st.markdown("""
-    <br>
+    
     The definition of the operational domain is an application of **AI Governance principles**. By explicitly setting boundaries, we proactively mitigate risks associated with unchecked AI behavior, ensuring compliance and preventing unintended consequences. This structured approach helps in achieving **AI alignment** with organizational objectives and ethical guidelines.
     """, unsafe_allow_html=True)

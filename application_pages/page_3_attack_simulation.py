@@ -134,6 +134,6 @@ def main():
         st.info("No successful attacks to analyze yet.")
 
     st.markdown("""
-    <br>
+    
     This exercise embodies **adversarial machine learning** and **red teaming**. By actively trying to break the system, you are acting as an ethical hacker, identifying crucial **vulnerability points** that could be exploited in a real-world scenario. The ability to simulate these attacks allows for proactive risk management and fortification of AI systems.
     """, unsafe_allow_html=True)

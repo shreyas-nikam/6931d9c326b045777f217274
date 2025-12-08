@@ -1,6 +1,125 @@
 import streamlit as st
 from utils import generate_robustness_report
 import pandas as pd
+from io import BytesIO
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
+from reportlab.lib import colors
+import re
+import base64
+
+def markdown_to_pdf(markdown_text):
+    """Convert markdown report to PDF and return as bytes."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.75*inch, bottomMargin=0.75*inch)
+    styles = getSampleStyleSheet()
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        textColor=colors.HexColor('#1f4788'),
+        spaceAfter=12,
+        alignment=1  # Center
+    )
+    
+    heading1_style = ParagraphStyle(
+        'CustomHeading1',
+        parent=styles['Heading1'],
+        fontSize=16,
+        textColor=colors.HexColor('#1f4788'),
+        spaceAfter=10,
+        spaceBefore=12
+    )
+    
+    heading2_style = ParagraphStyle(
+        'CustomHeading2',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#2c5aa0'),
+        spaceAfter=8,
+        spaceBefore=10
+    )
+    
+    heading3_style = ParagraphStyle(
+        'CustomHeading3',
+        parent=styles['Heading3'],
+        fontSize=12,
+        textColor=colors.HexColor('#2c5aa0'),
+        spaceAfter=6,
+        spaceBefore=8
+    )
+    
+    body_style = ParagraphStyle(
+        'CustomBody',
+        parent=styles['BodyText'],
+        fontSize=10,
+        spaceAfter=6
+    )
+    
+    def clean_markdown(text):
+        """Remove all markdown formatting from text."""
+        # Remove bold/italic markers
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **bold**
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *italic*
+        text = re.sub(r'__([^_]+)__', r'\1', text)      # __bold__
+        text = re.sub(r'_([^_]+)_', r'\1', text)        # _italic_
+        # Remove inline code markers
+        text = re.sub(r'`([^`]+)`', r'\1', text)        # `code`
+        # Remove links but keep text
+        text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)  # [text](url)
+        return text.strip()
+    
+    story = []
+    lines = markdown_text.split('\n')
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            story.append(Spacer(1, 0.1*inch))
+            continue
+        
+        # Title (# at start)
+        if line.startswith('# '):
+            text = clean_markdown(line[2:].strip())
+            story.append(Paragraph(text, title_style))
+        # Heading 1 (## at start)
+        elif line.startswith('## '):
+            text = clean_markdown(line[3:].strip())
+            story.append(Paragraph(text, heading1_style))
+        # Heading 2 (### at start)
+        elif line.startswith('### '):
+            text = clean_markdown(line[4:].strip())
+            story.append(Paragraph(text, heading2_style))
+        # Heading 3 (#### at start)
+        elif line.startswith('#### '):
+            text = clean_markdown(line[5:].strip())
+            story.append(Paragraph(text, heading3_style))
+        # Bullet points
+        elif line.startswith('- ') or line.startswith('* '):
+            text = '• ' + clean_markdown(line[2:].strip())
+            story.append(Paragraph(text, body_style))
+        # Horizontal rule
+        elif line.startswith('---') or line.startswith('***'):
+            story.append(Spacer(1, 0.2*inch))
+        # Regular text
+        else:
+            text = clean_markdown(line)
+            if text:  # Only add non-empty lines
+                story.append(Paragraph(text, body_style))
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def display_pdf(pdf_bytes):
+    """Display PDF in Streamlit using base64 encoding."""
+    base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800" type="application/pdf"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
 
 def main():
     st.markdown("## 6. Robustness Evaluation and Reporting")
@@ -69,17 +188,54 @@ def main():
             "mitigation_log": st.session_state.get("mitigation_log", pd.DataFrame())
         }
         report = generate_robustness_report(risk_assessment_data)
+        
+        # Store report in session state
+        st.session_state['generated_report'] = report
+        
+        st.success("Report generated successfully!")
+    
+    # Display report if it exists
+    if 'generated_report' in st.session_state and st.session_state['generated_report']:
+        report = st.session_state['generated_report']
+        
         st.markdown("### Generated Risk Assessment Report")
-        st.code(report, language="markdown")
-
-        st.download_button(
-            label="Download Report as Markdown",
-            data=report,
-            file_name="LLM_Risk_Assessment_Report.md",
-            mime="text/markdown"
-        )
+        
+        # Create tabs for different views
+        tab1, tab2 = st.tabs(["📄 PDF Viewer", "📝 Markdown View"])
+        
+        with tab1:
+            st.markdown("#### PDF Report")
+            try:
+                pdf_bytes = markdown_to_pdf(report)
+                display_pdf(pdf_bytes)
+                
+                # Download button for PDF
+                st.download_button(
+                    label="📥 Download Report as PDF",
+                    data=pdf_bytes,
+                    file_name="LLM_Risk_Assessment_Report.pdf",
+                    mime="application/pdf",
+                    key="download_pdf_button"
+                )
+            except Exception as e:
+                st.error(f"Error generating PDF: {e}")
+                st.info("Showing markdown view instead.")
+                st.code(report, language="markdown")
+        
+        with tab2:
+            st.markdown("#### Markdown Report")
+            st.code(report, language="markdown")
+            
+            # Download button for Markdown
+            st.download_button(
+                label="📥 Download Report as Markdown",
+                data=report,
+                file_name="LLM_Risk_Assessment_Report.md",
+                mime="text/markdown",
+                key="download_md_button"
+            )
     
     st.markdown("""
-    <br>
+    
     This report generation functionality embodies the principle of **accountability and transparency** in AI deployment. It translates complex technical findings into actionable business insights, enabling informed decision-making regarding the LLM agent's **readiness for production**. For the **Risk Manager**, this report is the tangible outcome of a thorough **AI risk management framework**, ensuring that potential vulnerabilities are understood and addressed before deployment.
     """, unsafe_allow_html=True)
