@@ -1,6 +1,7 @@
 import streamlit as st
 from utils import define_llm_agent_environment
 
+
 def main():
     st.markdown("## 1. Defining the LLM Agent's Operational Domain")
     st.markdown("""
@@ -14,7 +15,7 @@ def main():
     # Initialize session state for environment if not present
     if "operational_domain" not in st.session_state:
         st.session_state.operational_domain = {}
-    
+
     if "baseline_agent" not in st.session_state:
         st.session_state.baseline_agent = None
 
@@ -25,13 +26,15 @@ def main():
         st.markdown("""
         Define the types of financial data the LLM agent is explicitly **allowed** or **prohibited** from accessing. This directly addresses data privacy and confidentiality risks.
         """)
-        allowed_data_options = ["Public Market Data", "Company Financial Reports", "Economic Indicators", "Research Papers"]
-        prohibited_data_options = ["Client Personal Data", "Proprietary Trading Algorithms", "Unpublished M&A Deals", "Internal Employee Records"]
+        allowed_data_options = [
+            "Public Market Data", "Company Financial Reports", "Economic Indicators", "Research Papers"]
+        prohibited_data_options = ["Client Personal Data", "Proprietary Trading Algorithms",
+                                   "Unpublished M&A Deals", "Internal Employee Records"]
 
         selected_allowed_data = st.multiselect(
             "Select **Allowed** Data Access:",
             options=allowed_data_options,
-            default=allowed_data_options # Default to all allowed as a starting point
+            default=allowed_data_options  # Default to all allowed as a starting point
         )
 
         selected_prohibited_data = st.multiselect(
@@ -45,8 +48,10 @@ def main():
         st.markdown("""
         Specify the actions the LLM agent is permitted or forbidden to perform. This is vital for preventing unauthorized operations or manipulations within our financial systems.
         """)
-        allowed_actions_options = ["Provide Market Summaries", "Answer Financial FAQs", "Generate Research Report Drafts", "Suggest Publicly Available Resources"]
-        prohibited_actions_options = ["Execute Trades", "Transfer Funds", "Modify Client Portfolios", "Initiate System Commands"]
+        allowed_actions_options = ["Provide Market Summaries", "Answer Financial FAQs",
+                                   "Generate Research Report Drafts", "Suggest Publicly Available Resources"]
+        prohibited_actions_options = [
+            "Execute Trades", "Transfer Funds", "Modify Client Portfolios", "Initiate System Commands"]
 
         selected_allowed_actions = st.multiselect(
             "Select **Allowed** Actions:",
@@ -59,7 +64,7 @@ def main():
             options=prohibited_actions_options,
             default=["Execute Trades", "Transfer Funds"]
         )
-    
+
     st.markdown("---")
     st.markdown("""
     By clicking 'Save Environment Configuration', you are committing to this operational framework. This action represents the **Risk Manager's decision** to formalize the agent's boundaries, a critical step in setting up a secure AI system.
@@ -72,11 +77,56 @@ def main():
             selected_allowed_actions,
             selected_prohibited_actions
         )
-        st.success("Operational domain configured successfully! Proceed to the next step to observe baseline behavior.")
-        
+        st.success(
+            "Operational domain configured successfully! Proceed to the next step to observe baseline behavior.")
+
         st.markdown("### Current Operational Domain Summary")
-        st.json(st.session_state.operational_domain)
-    
+
+        # Display operational domain in a prettier format
+        col_left, col_right = st.columns(2)
+
+        with col_left:
+            st.markdown("#### 📊 Data Access Policies")
+
+            # Allowed Data Access
+            st.markdown("**✅ Allowed Data Access:**")
+            if st.session_state.operational_domain.get("allowed_data_access"):
+                for item in st.session_state.operational_domain["allowed_data_access"]:
+                    st.markdown(f"- {item}")
+            else:
+                st.markdown("- *None selected*")
+
+            st.markdown("")
+
+            # Prohibited Data Access
+            st.markdown("**🚫 Prohibited Data Access:**")
+            if st.session_state.operational_domain.get("prohibited_data_access"):
+                for item in st.session_state.operational_domain["prohibited_data_access"]:
+                    st.markdown(f"- {item}")
+            else:
+                st.markdown("- *None selected*")
+
+        with col_right:
+            st.markdown("#### ⚙️ Action Execution Policies")
+
+            # Allowed Actions
+            st.markdown("**✅ Allowed Actions:**")
+            if st.session_state.operational_domain.get("allowed_actions"):
+                for item in st.session_state.operational_domain["allowed_actions"]:
+                    st.markdown(f"- {item}")
+            else:
+                st.markdown("- *None selected*")
+
+            st.markdown("")
+
+            # Prohibited Actions
+            st.markdown("**🚫 Prohibited Actions:**")
+            if st.session_state.operational_domain.get("prohibited_actions"):
+                for item in st.session_state.operational_domain["prohibited_actions"]:
+                    st.markdown(f"- {item}")
+            else:
+                st.markdown("- *None selected*")
+
     st.markdown("""
     <br>
     The definition of the operational domain is an application of **AI Governance principles**. By explicitly setting boundaries, we proactively mitigate risks associated with unchecked AI behavior, ensuring compliance and preventing unintended consequences. This structured approach helps in achieving **AI alignment** with organizational objectives and ethical guidelines.

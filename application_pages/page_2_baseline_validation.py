@@ -1,6 +1,8 @@
 import streamlit as st
 from utils import MockLLMAgent
 import pandas as pd
+import json
+import os
 
 
 def _make_hashable(obj):
@@ -45,22 +47,137 @@ def main():
         st.session_state.baseline_interaction_log = pd.DataFrame(
             columns=["prompt", "response", "type", "success"])
 
-    st.markdown("### Interact with the Baseline LLM Agent")
-    user_prompt = st.text_input(
-        "Enter your query for the LLM agent:",
-        placeholder="e.g., What is the stock price for Apple Inc.?",
-        key="baseline_prompt_input"
-    )
+    # Load questions from JSON file
+    json_path = os.path.join(os.path.dirname(
+        os.path.dirname(__file__)), "llm_agent_qna.json")
+    try:
+        with open(json_path, 'r') as f:
+            qna_data = json.load(f)
+    except FileNotFoundError:
+        st.error(
+            "Questions database file not found. Please ensure llm_agent_qna.json exists.")
+        return
 
-    if st.button("Get Agent Response", key="baseline_response_button") and user_prompt:
-        with st.spinner("Agent thinking..."):
-            response, response_type = st.session_state.baseline_agent.respond(
-                user_prompt)
-            st.info(f"**Agent Response:** {response}")
-            new_log_entry = pd.DataFrame([{"prompt": user_prompt, "response": response, "type": response_type, "success": (
-                "blocked" not in response_type.lower())}])
-            st.session_state.baseline_interaction_log = pd.concat(
-                [st.session_state.baseline_interaction_log, new_log_entry], ignore_index=True)
+    st.markdown("### Interact with the Baseline LLM Agent")
+    st.markdown("""
+    Select a question category below and choose from pre-defined questions to test the agent's baseline behavior. 
+    These questions are designed to validate that the agent correctly handles **allowed data access** and **allowed actions**.
+    """)
+
+    # Create tabs for different question categories
+    tab1, tab2 = st.tabs(["📊 Allowed Data Access", "⚙️ Allowed Actions"])
+
+    with tab1:
+        st.markdown("#### Test Allowed Data Access Questions")
+        st.markdown(
+            "These questions test the agent's ability to provide information on publicly available financial data.")
+
+        # Group questions by data type
+        data_questions = qna_data["allowed_data_access"]["questions"]
+        data_types = list(set([q["data_type"] for q in data_questions]))
+
+        selected_data_type = st.selectbox(
+            "Select Data Type:",
+            options=data_types,
+            key="data_type_select"
+        )
+
+        # Filter questions by selected data type
+        filtered_questions = [
+            q for q in data_questions if q["data_type"] == selected_data_type]
+        question_options = {
+            f"{q['id']}: {q['question']}": q for q in filtered_questions}
+
+        selected_question_key = st.selectbox(
+            "Select a Question:",
+            options=list(question_options.keys()),
+            key="data_question_select"
+        )
+
+        selected_question = question_options[selected_question_key]
+
+        # Show context
+        with st.expander("ℹ️ View Question Context"):
+            st.info(selected_question["context"])
+
+        if st.button("Ask Agent", key="data_question_button"):
+            user_prompt = selected_question["question"]
+            with st.spinner("Agent thinking..."):
+                response, response_type = st.session_state.baseline_agent.respond(
+                    user_prompt)
+
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.markdown("**Agent Response:**")
+                    st.success(response)
+                with col2:
+                    st.markdown("**Response Type:**")
+                    st.info(response_type)
+
+                new_log_entry = pd.DataFrame([{
+                    "prompt": user_prompt,
+                    "response": response,
+                    "type": response_type,
+                    "success": ("blocked" not in response_type.lower())
+                }])
+                st.session_state.baseline_interaction_log = pd.concat(
+                    [st.session_state.baseline_interaction_log, new_log_entry], ignore_index=True)
+
+    with tab2:
+        st.markdown("#### Test Allowed Action Questions")
+        st.markdown(
+            "These questions test the agent's ability to perform permitted operations.")
+
+        # Group questions by action type
+        action_questions = qna_data["allowed_actions"]["questions"]
+        action_types = list(set([q["action_type"] for q in action_questions]))
+
+        selected_action_type = st.selectbox(
+            "Select Action Type:",
+            options=action_types,
+            key="action_type_select"
+        )
+
+        # Filter questions by selected action type
+        filtered_actions = [
+            q for q in action_questions if q["action_type"] == selected_action_type]
+        action_options = {
+            f"{q['id']}: {q['question']}": q for q in filtered_actions}
+
+        selected_action_key = st.selectbox(
+            "Select a Question:",
+            options=list(action_options.keys()),
+            key="action_question_select"
+        )
+
+        selected_action = action_options[selected_action_key]
+
+        # Show context
+        with st.expander("ℹ️ View Question Context"):
+            st.info(selected_action["context"])
+
+        if st.button("Ask Agent", key="action_question_button"):
+            user_prompt = selected_action["question"]
+            with st.spinner("Agent thinking..."):
+                response, response_type = st.session_state.baseline_agent.respond(
+                    user_prompt)
+
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.markdown("**Agent Response:**")
+                    st.success(response)
+                with col2:
+                    st.markdown("**Response Type:**")
+                    st.info(response_type)
+
+                new_log_entry = pd.DataFrame([{
+                    "prompt": user_prompt,
+                    "response": response,
+                    "type": response_type,
+                    "success": ("blocked" not in response_type.lower())
+                }])
+                st.session_state.baseline_interaction_log = pd.concat(
+                    [st.session_state.baseline_interaction_log, new_log_entry], ignore_index=True)
 
     st.markdown("### Interaction Log")
     if not st.session_state.baseline_interaction_log.empty:

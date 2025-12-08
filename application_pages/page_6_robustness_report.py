@@ -2,6 +2,7 @@ import streamlit as st
 from utils import generate_robustness_report
 import pandas as pd
 
+
 def main():
     st.markdown("## 6. Robustness Evaluation and Reporting")
     st.markdown("""
@@ -21,12 +22,14 @@ def main():
         st.markdown("#### Operational Domain Defined:")
         st.json(st.session_state.operational_domain)
     else:
-        st.warning("Operational domain was not fully defined. Please complete '1. Introduction and Setup'.")
-    
+        st.warning(
+            "Operational domain was not fully defined. Please complete '1. Introduction and Setup'.")
+
     if "baseline_interaction_log" in st.session_state and not st.session_state.baseline_interaction_log.empty:
         st.markdown("#### Baseline Interactions Log:")
         st.dataframe(st.session_state.baseline_interaction_log.head())
-        st.caption(f"Total baseline interactions: {len(st.session_state.baseline_interaction_log)}")
+        st.caption(
+            f"Total baseline interactions: {len(st.session_state.baseline_interaction_log)}")
     else:
         st.info("No baseline interactions recorded.")
 
@@ -35,15 +38,18 @@ def main():
         st.dataframe(st.session_state.attack_log.head())
         successful_attacks = st.session_state.attack_log["success"].sum()
         total_attacks = len(st.session_state.attack_log)
-        st.caption(f"Total attacks: {total_attacks}, Successful attacks: {successful_attacks}")
+        st.caption(
+            f"Total attacks: {total_attacks}, Successful attacks: {successful_attacks}")
     else:
         st.info("No adversarial attack simulations performed.")
-    
+
     if "bias_attack_log" in st.session_state and not st.session_state.bias_attack_log.empty:
         st.markdown("#### Bias/Poisoning Attack Log:")
         st.dataframe(st.session_state.bias_attack_log.head())
-        successful_bias_attacks = st.session_state.bias_attack_log["success"].sum()
-        st.caption(f"Total bias tests: {len(st.session_state.bias_attack_log)}, Successful bias attacks: {successful_bias_attacks}")
+        successful_bias_attacks = st.session_state.bias_attack_log["success"].sum(
+        )
+        st.caption(
+            f"Total bias tests: {len(st.session_state.bias_attack_log)}, Successful bias attacks: {successful_bias_attacks}")
     else:
         st.info("No bias induction or data poisoning simulations performed.")
 
@@ -51,8 +57,10 @@ def main():
         st.markdown("#### Mitigation Strategy Log:")
         st.dataframe(st.session_state.mitigation_log.head())
         total_mitigated_tests = len(st.session_state.mitigation_log)
-        blocked_by_mitigation = st.session_state.mitigation_log[st.session_state.mitigation_log["type"].str.contains("blocked")].shape[0]
-        st.caption(f"Total mitigation tests: {total_mitigated_tests}, Blocked by mitigation: {blocked_by_mitigation}")
+        blocked_by_mitigation = st.session_state.mitigation_log[st.session_state.mitigation_log["type"].str.contains(
+            "blocked")].shape[0]
+        st.caption(
+            f"Total mitigation tests: {total_mitigated_tests}, Blocked by mitigation: {blocked_by_mitigation}")
     else:
         st.info("No mitigation strategy tests performed.")
 
@@ -78,7 +86,7 @@ def main():
             file_name="LLM_Risk_Assessment_Report.md",
             mime="text/markdown"
         )
-    
+
     st.markdown("""
     <br>
     This report generation functionality embodies the principle of **accountability and transparency** in AI deployment. It translates complex technical findings into actionable business insights, enabling informed decision-making regarding the LLM agent's **readiness for production**. For the **Risk Manager**, this report is the tangible outcome of a thorough **AI risk management framework**, ensuring that potential vulnerabilities are understood and addressed before deployment.
