@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import MockLLMAgent
+from gemini_agent import GeminiLLMAgent
 import pandas as pd
 
 def main():
@@ -16,15 +16,31 @@ def main():
         st.warning("Please define the operational domain in '1. Introduction and Setup' first.")
         return
 
-    # Initialize baseline agent and log if not present or if operational domain changed
-    current_domain_hash = hash(frozenset(st.session_state.operational_domain.items())) # Simple way to detect domain changes
+    if "gemini_api_key" not in st.session_state or not st.session_state["gemini_api_key"]:
+        st.warning("Please enter your Gemini API key in '1. Introduction and Setup' to use the LLM.")
+        return
+
+    # Initialize Gemini agent for baseline testing
+    current_domain_hash = hash(frozenset(
+        (k, tuple(v) if isinstance(v, list) else v)
+        for k, v in st.session_state.operational_domain.items()
+    ))
+    
     if "baseline_agent" not in st.session_state or st.session_state.get("baseline_domain_hash") != current_domain_hash:
-        st.session_state.baseline_agent = MockLLMAgent(operational_domain=st.session_state.operational_domain)
-        st.session_state.baseline_domain_hash = current_domain_hash
-        st.session_state.baseline_interaction_log = pd.DataFrame(columns=["prompt", "response", "type", "success"])
+        try:
+            st.session_state.baseline_agent = GeminiLLMAgent(
+                api_key=st.session_state["gemini_api_key"],
+                operational_domain=st.session_state.operational_domain
+            )
+            st.session_state.baseline_domain_hash = current_domain_hash
+        except Exception as e:
+            st.error(f"Failed to initialize Gemini agent: {e}")
+            return
     
     if "baseline_interaction_log" not in st.session_state:
         st.session_state.baseline_interaction_log = pd.DataFrame(columns=["prompt", "response", "type", "success"])
+    
+    st.caption("Using Gemini LLM (gemini-2.5-flash) for responses.")
 
     st.markdown("### Interact with the Baseline LLM Agent")
     user_prompt = st.text_input(

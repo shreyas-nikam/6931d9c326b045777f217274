@@ -2,6 +2,14 @@ import streamlit as st
 from utils import define_llm_agent_environment
 
 def main():
+    st.markdown("### Gemini API Key Setup")
+    st.markdown("To use the actual Gemini LLM, please enter your Google Gemini API key below. You can get your key from https://aistudio.google.com/app/apikey.")
+    gemini_api_key = st.text_input("Enter your Gemini API Key", type="password", key="gemini_api_key_input")
+    if gemini_api_key:
+        st.session_state["gemini_api_key"] = gemini_api_key
+        st.success("Gemini API key saved in session.")
+    elif "gemini_api_key" in st.session_state:
+        st.info("Gemini API key already set for this session.")
     st.markdown("## 1. Defining the LLM Agent's Operational Domain")
     st.markdown("""
     As the **Risk Manager**, your first crucial step is to establish a clear operational domain for our new financial LLM agent. This defines *what* the agent is allowed to access, *what* it can do, and equally important, *what it must never do*. This proactive step sets the baseline for secure and compliant AI operation.
