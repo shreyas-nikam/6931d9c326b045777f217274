@@ -98,50 +98,46 @@ Your objective is to ensure this LLM agent is not only powerful but also secure 
 
         st.markdown("### Current Operational Domain Summary")
 
-        # Display operational domain in a prettier format
-        col_left, col_right = st.columns(2)
+        # Display operational domain in 4 separate containers with borders
+        col1, col2 = st.columns(2)
 
-        with col_left:
-            st.markdown("#### 📊 Data Access Policies")
+        with col1:
+            with st.container(border=True):
+                st.markdown("#### 📊 Allowed Data Access")
+                if st.session_state.operational_domain.get("allowed_data_access"):
+                    for item in st.session_state.operational_domain["allowed_data_access"]:
+                        st.markdown(f"✅ {item}")
+                else:
+                    st.markdown("*None selected*")
 
-            # Allowed Data Access
-            st.markdown("**✅ Allowed Data Access:**")
-            if st.session_state.operational_domain.get("allowed_data_access"):
-                for item in st.session_state.operational_domain["allowed_data_access"]:
-                    st.markdown(f"- {item}")
-            else:
-                st.markdown("- *None selected*")
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### 🚫 Prohibited Data Access")
+                if st.session_state.operational_domain.get("prohibited_data_access"):
+                    for item in st.session_state.operational_domain["prohibited_data_access"]:
+                        st.markdown(f"🚫 {item}")
+                else:
+                    st.markdown("*None selected*")
 
-            st.markdown("")
+        col3, col4 = st.columns(2)
 
-            # Prohibited Data Access
-            st.markdown("**🚫 Prohibited Data Access:**")
-            if st.session_state.operational_domain.get("prohibited_data_access"):
-                for item in st.session_state.operational_domain["prohibited_data_access"]:
-                    st.markdown(f"- {item}")
-            else:
-                st.markdown("- *None selected*")
+        with col3:
+            with st.container(border=True):
+                st.markdown("#### ⚙️ Allowed Actions")
+                if st.session_state.operational_domain.get("allowed_actions"):
+                    for item in st.session_state.operational_domain["allowed_actions"]:
+                        st.markdown(f"✅ {item}")
+                else:
+                    st.markdown("*None selected*")
 
-        with col_right:
-            st.markdown("#### ⚙️ Action Execution Policies")
-
-            # Allowed Actions
-            st.markdown("**✅ Allowed Actions:**")
-            if st.session_state.operational_domain.get("allowed_actions"):
-                for item in st.session_state.operational_domain["allowed_actions"]:
-                    st.markdown(f"- {item}")
-            else:
-                st.markdown("- *None selected*")
-
-            st.markdown("")
-
-            # Prohibited Actions
-            st.markdown("**🚫 Prohibited Actions:**")
-            if st.session_state.operational_domain.get("prohibited_actions"):
-                for item in st.session_state.operational_domain["prohibited_actions"]:
-                    st.markdown(f"- {item}")
-            else:
-                st.markdown("- *None selected*")
+        with col4:
+            with st.container(border=True):
+                st.markdown("#### ⚠️ Prohibited Actions")
+                if st.session_state.operational_domain.get("prohibited_actions"):
+                    for item in st.session_state.operational_domain["prohibited_actions"]:
+                        st.markdown(f"🚫 {item}")
+                else:
+                    st.markdown("*None selected*")
 
     st.markdown("""
     

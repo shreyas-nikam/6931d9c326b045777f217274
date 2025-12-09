@@ -20,7 +20,47 @@ def main():
 
     if "operational_domain" in st.session_state and st.session_state.operational_domain:
         st.markdown("#### Operational Domain Defined:")
-        st.json(st.session_state.operational_domain)
+
+        # Display operational domain in 4 separate containers with borders
+        col1, col2 = st.columns(2)
+
+        with col1:
+            with st.container(border=True):
+                st.markdown("#### 📊 Allowed Data Access")
+                if st.session_state.operational_domain.get("allowed_data_access"):
+                    for item in st.session_state.operational_domain["allowed_data_access"]:
+                        st.markdown(f"✅ {item}")
+                else:
+                    st.markdown("*None selected*")
+
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### 🚫 Prohibited Data Access")
+                if st.session_state.operational_domain.get("prohibited_data_access"):
+                    for item in st.session_state.operational_domain["prohibited_data_access"]:
+                        st.markdown(f"🚫 {item}")
+                else:
+                    st.markdown("*None selected*")
+
+        col3, col4 = st.columns(2)
+
+        with col3:
+            with st.container(border=True):
+                st.markdown("#### ⚙️ Allowed Actions")
+                if st.session_state.operational_domain.get("allowed_actions"):
+                    for item in st.session_state.operational_domain["allowed_actions"]:
+                        st.markdown(f"✅ {item}")
+                else:
+                    st.markdown("*None selected*")
+
+        with col4:
+            with st.container(border=True):
+                st.markdown("#### ⚠️ Prohibited Actions")
+                if st.session_state.operational_domain.get("prohibited_actions"):
+                    for item in st.session_state.operational_domain["prohibited_actions"]:
+                        st.markdown(f"🚫 {item}")
+                else:
+                    st.markdown("*None selected*")
     else:
         st.warning(
             "Operational domain was not fully defined. Please complete '1. Introduction and Setup'.")
